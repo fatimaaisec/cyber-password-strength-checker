@@ -1,51 +1,111 @@
 import re
+import math
 
-def check_password_strength(password):
+
+COMMON_PASSWORDS = [
+    "password", "123456", "qwerty",
+    "admin", "welcome", "password123"
+]
+
+
+def calculate_entropy(password):
+    charset_size = 0
+
+    if re.search(r"[a-z]", password):
+        charset_size += 26
+
+    if re.search(r"[A-Z]", password):
+        charset_size += 26
+
+    if re.search(r"\d", password):
+        charset_size += 10
+
+    if re.search(r"[!@#$%^&*()_+=\-{}\[\]:;\"'<>,.?/]", password):
+        charset_size += 32
+
+    if charset_size == 0:
+        return 0
+
+    entropy = len(password) * math.log2(charset_size)
+    return round(entropy, 2)
+
+
+def password_strength(password):
     score = 0
     feedback = []
 
-    if len(password) >= 8:
-        score += 1
+    # Length
+    if len(password) >= 12:
+        score += 3
+    elif len(password) >= 8:
+        score += 2
     else:
-        feedback.append("Password should be at least 8 characters.")
+        feedback.append("Use at least 8–12 characters.")
 
+    # Uppercase
     if re.search(r"[A-Z]", password):
         score += 1
     else:
-        feedback.append("Add at least one uppercase letter.")
+        feedback.append("Add uppercase letters.")
 
+    # Lowercase
     if re.search(r"[a-z]", password):
         score += 1
     else:
-        feedback.append("Add at least one lowercase letter.")
+        feedback.append("Add lowercase letters.")
 
+    # Numbers
     if re.search(r"\d", password):
         score += 1
     else:
-        feedback.append("Add at least one number.")
+        feedback.append("Add numbers.")
 
-    if re.search(r"[!@#$%^&*]", password):
-        score += 1
+    # Special chars
+    if re.search(r"[!@#$%^&*()_+=\-]", password):
+        score += 2
     else:
-        feedback.append("Add at least one special character.")
+        feedback.append("Add special characters.")
+
+    # Weak/common passwords
+    if password.lower() in COMMON_PASSWORDS:
+        score -= 5
+        feedback.append("This password is extremely common.")
+
+    # Repeated chars
+    if re.search(r"(.)\1{2,}", password):
+        score -= 2
+        feedback.append("Avoid repeated characters.")
+
+    # Sequential patterns
+    if "123" in password or "abc" in password.lower():
+        score -= 2
+        feedback.append("Avoid predictable sequences.")
+
+    entropy = calculate_entropy(password)
 
     if score <= 2:
-        strength = "Weak"
-    elif score <= 4:
-        strength = "Medium"
+        level = "Weak"
+    elif score <= 5:
+        level = "Medium"
+    elif score <= 8:
+        level = "Strong"
     else:
-        strength = "Strong"
+        level = "Very Strong"
 
-    return strength, feedback
+    return level, entropy, feedback
 
 
-password = input("Enter a password: ")
+password = input("Enter password: ")
 
-strength, feedback = check_password_strength(password)
+strength, entropy, feedback = password_strength(password)
 
-print(f"\nPassword Strength: {strength}")
+print("\n====== Password Analysis ======")
+print("Strength:", strength)
+print("Entropy:", entropy, "bits")
 
 if feedback:
     print("\nSuggestions:")
     for tip in feedback:
         print("-", tip)
+else:
+    print("\nExcellent password!")
