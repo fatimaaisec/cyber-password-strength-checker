@@ -1,1 +1,13 @@
+Example Runs of Password Checker
 
+1.
+Input: password123
+Output: Weak password
+
+2.
+Input: Password@123
+Output: Medium/Strong password
+
+3.
+Input: A!x92#Zk
+Output: Strong password
