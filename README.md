@@ -38,6 +38,9 @@ This project evaluates password security using:
 cyber-password-strength-checker/
 │── password_checker.py
 │── README.md
+│── requirements.txt
+│── examples/
+     └── usage.txt
 ```
 
 ---
