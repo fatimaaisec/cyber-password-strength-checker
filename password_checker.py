@@ -1,6 +1,6 @@
 import re
 import math
-
+import random
 
 COMMON_PASSWORDS = [
     "password", "123456", "qwerty",
@@ -28,8 +28,19 @@ def calculate_entropy(password):
 
     entropy = len(password) * math.log2(charset_size)
     return round(entropy, 2)
+    
+
+words = ["Tiger", "Cyber", "Shield", "Matrix"]
 
 
+def generate_stronger_password(password):
+    special = random.choice(["@", "#", "!"])
+    number = str(random.randint(10, 99))
+    word = random.choice(words)
+
+    stronger = password.capitalize() + special + number + word
+    return stronger
+    
 def password_strength(password):
     score = 0
     feedback = []
@@ -109,3 +120,5 @@ if feedback:
         print("-", tip)
 else:
     print("\nExcellent password!")
+    print("\nSuggested Stronger Password:")
+print(generate_stronger_password(password))
